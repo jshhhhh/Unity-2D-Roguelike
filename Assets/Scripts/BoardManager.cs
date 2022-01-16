@@ -142,6 +142,7 @@ public class BoardManager : MonoBehaviour
         }
     }
 
+    //레벨에 따라 배치
     public void SetUpScene(int level)
     {
         BoardSetup();
