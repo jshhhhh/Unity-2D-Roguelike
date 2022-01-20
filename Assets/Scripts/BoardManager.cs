@@ -43,7 +43,7 @@ public class BoardManager : MonoBehaviour
     public int columns = 8;
     public int rows = 8;
     //레벨마다 얼마나 많은 벽을 랜덤하게 생성할지 설정
-    //최수 5개, 최대 9개의 벽 생성
+    //최소 5개, 최대 9개의 벽 생성
     public Count wallCount = new Count(5, 9);
     //음식 개수 설정
     public Count foodCount = new Count(1, 5);
