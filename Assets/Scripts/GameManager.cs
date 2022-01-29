@@ -8,6 +8,8 @@ public class GameManager : MonoBehaviour
     //static으로 선언된 변수의 값을 공유함
     public static GameManager instance = null;
     public BoardManager boardScript;
+    public int playerFoodPoints = 100;
+    [HideInInspector]public bool playersTurn = true;
 
     private int level = 3;
 
@@ -34,6 +36,12 @@ public class GameManager : MonoBehaviour
     void InitGame()
     {
         boardScript.SetUpScene(level);
+    }
+
+    public void GameOver()
+    {
+        //비활성화
+        enabled = false;
     }
 
     // Update is called once per frame
