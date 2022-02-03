@@ -16,6 +16,9 @@ public class Enemy : MovingObject
     //부모 클래스의 Start 함수를 재정의
     protected override void Start()
     {
+        //Enemy 스크립트가 자기 스스로를 게임 매니저의 적 리스트에 더함
+        //게임 매니저가 Enemy의 MoveEnemy 함수 호출 가능
+        GameManager.instance.AddEnemyToLisy(this);
         animator = GetComponent<Animator>();
         //플레이어의 transform 저장
         target = GameObject.FindGameObjectWithTag("Player").transform;
@@ -72,6 +75,8 @@ public class Enemy : MovingObject
         //컴포넌트를 Player로 형변환 
         Player hitPlayer = component as Player;
         
+        animator.SetTrigger("enemyAttack");
+
         //데미지만큼 음식 점수를 잃음
         hitPlayer.LoseFood(playerDamage);
     }

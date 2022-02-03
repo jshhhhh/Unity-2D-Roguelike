@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MovingObject
 {
@@ -88,7 +89,7 @@ public class Player : MovingObject
     private void OnTriggerEnter2D(Collider2D other)
     {
         //충돌한 오브젝트의 태그 체크
-        if(other.tag == "Ezit")
+        if(other.tag == "Exit")
         {
             //restartLevelDelay: 1초?
             //1초간 정지 후 레벨 다시 시작
@@ -126,7 +127,8 @@ public class Player : MovingObject
     {
         //마지막에 로드된 씬을 로드한다는 의미(유일한 씬인 main)
         //다른 레벨을 로드하기 위해 다른 씬을 불러올 필요X(레벨을 스크립트로 생성)
-        Application.LoadLevel(Application.loadedLevel);
+        //Application.LoadLevel(Application.loadedLevel);
+        SceneManager.GetActiveScene();
     }
 
     //적이 플레이어를 공격할 때 호출
