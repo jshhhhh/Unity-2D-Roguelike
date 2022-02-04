@@ -2,10 +2,13 @@ using System.Collections;
 //적을 계속 추적하기 위해 사용할 리스트 자료 구조 사용
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 public class GameManager : MonoBehaviour
 {
+    //레벨이 시작되기 전 초 단위로 대기할 시간
+    public float levelStartDelay = 2f;
     //턴 사이에 게임이 얼마 동안 대기할지 나타내는 변수
     public float turnDelay = 0.1f;
     //싱글톤(클래스 바깥에서도 접근 가능하기 위해 public)
@@ -15,11 +18,17 @@ public class GameManager : MonoBehaviour
     public int playerFoodPoints = 100;
     [HideInInspector]public bool playersTurn = true;
 
-    private int level = 3;
+    //레벨 숫자를 표시할 텍스트(Day 1...)
+    private Text levelText;
+    //
+    private GameObject levelImage;
+    private int level = 1;
     //적들의 위치 추적, 움직임 명령
     private List<Enemy> enemies;
     //
     private bool enemiesMoving;
+    //게임 보드를 만드는 중인지 체크, 만드는 중에는 플레이어 움직임 방지
+    private bool doingSetup;
 
     // Start is called before the first frame update
     void Awake()
@@ -43,16 +52,45 @@ public class GameManager : MonoBehaviour
         InitGame();
     }
 
+    //유니티 API 기본 제공 함수
+    //씬이 로드될 때마다 호출됨
+    private void OnLevelWasLoaded(int index)
+    {
+        level++;
+
+        InitGame();
+    }
+
+    //게임이 시작될 때 적 리스트 초기화
+    //이전 레벨에서의 적들 전부 정리
     void InitGame()
     {
-        //게임이 시작될 때 적 리스트 초기화
-        //이전 레벨에서의 적들 전부 정리
+        //타이틀 카드가 뜨는 동안 플레이어는 움직일 수 없음
+
+        levelImage = GameObject.Find("LevelImage");
+        levelText = GameObject.Find("LevelText").GetComponent<Text>();
+        levelText.text = "Day " + level;
+        levelImage.SetActive(true);
+        //이미지가 보여진 뒤 꺼질 때까지 2초(levelStartDelay)가 걸림
+        Invoke("HideLevelImage", levelStartDelay);
+
+        doingSetup = true;
         enemies.Clear();
         boardScript.SetUpScene(level);
     }
 
+    //레벨을 시작할 준비가 됐을 때 levelImage를 끄는 함수, InitGame 함수에서 Invoke(지연 시간 후 함수 호출)
+    private void HideLevelImage()
+    {
+        levelImage.SetActive(false);
+        //플레이어가 움직일 수 있게
+        doingSetup = false;
+    }
+
     public void GameOver()
     {
+        levelText.text = "After " + level + " days, you starved.";
+        levelImage.SetActive(true);
         //비활성화
         enabled = false;
     }
@@ -61,7 +99,7 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         //enemiesMoving: 적이 이동 중
-        if(playersTurn || enemiesMoving)
+        if(playersTurn || enemiesMoving || doingSetup)
             //아래 코드 실행하지 않음
             return;
         

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Player : MovingObject
 {
@@ -11,6 +12,7 @@ public class Player : MovingObject
     public int pointsPerFood = 10;
     public int pointsPerSoda = 20;
     public float restartLevelDelay = 1f;
+    public Text foodText;
 
     //애니메이터 컴포넌트의 레퍼런스 가져와 저장
     private Animator animator;
@@ -25,6 +27,8 @@ public class Player : MovingObject
 
         //해당 레벨 동안 음식 점수를 관리
         food = GameManager.instance.playerFoodPoints;
+
+        foodText.text = "Food: " + food;
 
         //부모 클래스의 Start() 실행
         base.Start();
@@ -71,6 +75,7 @@ public class Player : MovingObject
     {
         //움직일 때마다 음식 점수 1 잃음
         food--;
+        foodText.text = "Food: " + food;
 
         //부모 클래스의 AttemptMove 호출
         //일반형 입력 T와 함께 정수형 x방향, y방항을 입력으로 넣어줌
@@ -91,7 +96,7 @@ public class Player : MovingObject
         //충돌한 오브젝트의 태그 체크
         if(other.tag == "Exit")
         {
-            //restartLevelDelay: 1초?
+            //restartLevelDelay: 1초
             //1초간 정지 후 레벨 다시 시작
             Invoke("Restart", restartLevelDelay);
             enabled = false;
@@ -100,12 +105,16 @@ public class Player : MovingObject
         {
             //점수 추가 후 오브젝트 비활성화
             food += pointsPerFood;
+            //음식 오브젝트를 먹었을 때 메시지 표시
+            foodText.text ="+" + pointsPerFood + " Food:" + food;
             other.gameObject.SetActive(false);
         }
         else if(other.tag == "Soda")
         {
             //점수 추가 후 오브젝트 비활성화
             food += pointsPerSoda;
+            //소다 오브젝트를 먹었을 때 메시지 표시
+            foodText.text ="+" + pointsPerSoda + " Food:" + food;
             other.gameObject.SetActive(false);
         }
     }
@@ -127,8 +136,8 @@ public class Player : MovingObject
     {
         //마지막에 로드된 씬을 로드한다는 의미(유일한 씬인 main)
         //다른 레벨을 로드하기 위해 다른 씬을 불러올 필요X(레벨을 스크립트로 생성)
-        //Application.LoadLevel(Application.loadedLevel);
-        SceneManager.GetActiveScene();
+        Application.LoadLevel(Application.loadedLevel);
+        //SceneManager.GetActiveScene();
     }
 
     //적이 플레이어를 공격할 때 호출
@@ -139,6 +148,8 @@ public class Player : MovingObject
         animator.SetTrigger("playerHit");
         //loss만큼 점수 손실
         food -= loss;
+        //공격당했을 때 잃은 점수 메시지 표시
+        foodText.text = "-" + loss + " Food: " + food;
         //게임이 끝날 만큼의 점수를 잃었는지 체크
         CheckIfGameOver();
     }
