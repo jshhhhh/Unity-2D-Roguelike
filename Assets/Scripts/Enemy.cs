@@ -12,6 +12,8 @@ public class Enemy : MovingObject
     private Transform target;
     //적이 턴마다 움직이게 함
     private bool skipMove;
+    public AudioClip enemyAttack1;
+    public AudioClip enemyAttack2;
 
     //부모 클래스의 Start 함수를 재정의
     protected override void Start()
@@ -74,10 +76,12 @@ public class Enemy : MovingObject
     {
         //컴포넌트를 Player로 형변환 
         Player hitPlayer = component as Player;
-        
-        animator.SetTrigger("enemyAttack");
 
         //데미지만큼 음식 점수를 잃음
         hitPlayer.LoseFood(playerDamage);
+        
+        animator.SetTrigger("enemyAttack");
+
+        SoundManager.instance.RandomizeSfx(enemyAttack1, enemyAttack2);
     }
 }

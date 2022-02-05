@@ -8,6 +8,8 @@ public class Wall : MonoBehaviour
     public Sprite dmgSprite;
     //벽의 히트 포인트(내구도)
     public int hp = 4;
+    public AudioClip chopSound1;
+    public AudioClip chopSound2;
 
     private SpriteRenderer spriteRenderer;
 
@@ -20,6 +22,7 @@ public class Wall : MonoBehaviour
 
     public void DamageWall(int loss)
     {
+        SoundManager.instance.RandomizeSfx(chopSound1,chopSound2);
         //스프라이트를 교체해서 시각적인 변화
         spriteRenderer.sprite = dmgSprite;
         //남은 체력을 loss만큼 감소

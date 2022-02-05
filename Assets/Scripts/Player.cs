@@ -13,6 +13,13 @@ public class Player : MovingObject
     public int pointsPerSoda = 20;
     public float restartLevelDelay = 1f;
     public Text foodText;
+    public AudioClip moveSound1;
+    public AudioClip moveSound2;
+    public AudioClip eatSound1;
+    public AudioClip eatSound2;
+    public AudioClip drinkSound1;
+    public AudioClip drinkSound2;
+    public AudioClip gameOverSound;
 
     //애니메이터 컴포넌트의 레퍼런스 가져와 저장
     private Animator animator;
@@ -83,6 +90,13 @@ public class Player : MovingObject
 
         //Move함수에서 이루어진 라인캐스트 충돌 결과의 레퍼런스를 가져올 변수 선언
         RaycastHit2D hit;
+        //Move가 true를 리턴하는지(플레이어가 움직일 수 있는지)
+        if(Move(xDir,yDir, out hit))
+        {
+            //두 개 중 하나의 이동 효과음 재생
+            //params 키워드를 통해 콤마가 하나의 배열로 합쳐 입력됨
+            SoundManager.instance.RandomizeSfx(moveSound1, moveSound2);
+        }
 
         //움직이면서 음식 점수를 잃기 때문에 체크
         CheckIfGameOver();
@@ -106,7 +120,8 @@ public class Player : MovingObject
             //점수 추가 후 오브젝트 비활성화
             food += pointsPerFood;
             //음식 오브젝트를 먹었을 때 메시지 표시
-            foodText.text ="+" + pointsPerFood + " Food:" + food;
+            foodText.text ="+" + pointsPerFood + " Food: " + food;
+            SoundManager.instance.RandomizeSfx(eatSound1, eatSound2);
             other.gameObject.SetActive(false);
         }
         else if(other.tag == "Soda")
@@ -114,7 +129,8 @@ public class Player : MovingObject
             //점수 추가 후 오브젝트 비활성화
             food += pointsPerSoda;
             //소다 오브젝트를 먹었을 때 메시지 표시
-            foodText.text ="+" + pointsPerSoda + " Food:" + food;
+            foodText.text ="+" + pointsPerSoda + " Food: " + food;
+            SoundManager.instance.RandomizeSfx(drinkSound1, drinkSound2);
             other.gameObject.SetActive(false);
         }
     }
@@ -156,7 +172,13 @@ public class Player : MovingObject
 
     private void CheckIfGameOver()
     {
-        if(food == 0)
+        if(food <= 0)
+        {
+            //게임 오버 사운드 재생
+            SoundManager.instance.PlaySingle(gameOverSound);
+            //musicSource 재생 멈춤
+            SoundManager.instance.musicSource.Stop();
             GameManager.instance.GameOver();
+        }
     }
 }
