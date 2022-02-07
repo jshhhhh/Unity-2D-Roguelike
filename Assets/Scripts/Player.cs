@@ -25,6 +25,11 @@ public class Player : MovingObject
     private Animator animator;
     //해당 레벨의 플레이어 스코어 저장
     private int food;
+    //플레이어의 터치가 시작되는 지점 저장
+    //-Vector2.one: 스크린 밖의 위치를 의미
+    //터치 입력이 있는지 없는지 확인
+    //실제 터치가 이루어지기 전까진 거짓값으로 초기화
+    private Vector2 touchOrigin = -Vector2.one;
 
 
     //Player의 Start를 구현
@@ -60,6 +65,9 @@ public class Player : MovingObject
         int horizontal = 0;
         int vertical = 0;
 
+        //스탠드 얼론 빌드 또는 웹 플레이어 실행 체크
+        #if UNITY_STANDALONE || UNITY_WEBPLAYER
+
         //우: 1, 좌: -1 반환
         horizontal = (int)Input.GetAxisRaw("Horizontal");
         //상: 1, 하: -1 반환
@@ -68,6 +76,45 @@ public class Player : MovingObject
         //대각선 움직임 방지
         if(horizontal != 0)
             vertical  = 0;
+
+        //IOS, 안드로이드, 윈도우8 기타 등등
+        #else
+
+            //하나 이상의 터치를 감지했을 때
+            if(Input.touchCount > 0)
+            {
+                //처음 터치 지점 저장
+                //첫 번째 터치 지점만 잡아내고, 나머지 터치 전부 무시(한 방향에 대한 한 손가락의 스와이핑만 지원)
+                Touch myTouch = Input.touches[0];
+
+                //'터치가 막 시작(Began)' 상태인지 체크
+                if(myTouch.phase == TouchPhase.Began)
+                {
+                    touchOrigin = myTouch.position;
+                }
+
+                //'터치가 막 끝남(Ended))' 상태인지 체크, touchOrigin이 0보다 크거나 같은지 체크
+                //touchOrigin을 -1로 초기화해놓음
+                //터치가 이루어졌다는 의미(초기화했던 값이 바뀜)
+                else if(myTouch.phase == TouchPhase.Ended && touchOrigin.x >= 0)
+                {
+                    Vector2 touchEnd = myTouch.position;
+                    //두 터치의 차(이동의 방향 알 수 있음)
+                    float x = touchEnd.x - touchOrigin.x;
+                    float y = touchEnd.y - touchOrigin.y;
+                    //계속해서 true 반복하지 않게 초기화
+                    touchOrigin.x = -1;
+
+                    //방향에서 터치가 좀 더 가로쪽인지 세로쪽인지 찾아야 함
+                    //절대값 비교로 유저가 스와이프하련 방향 체크
+                    if(Mathf.Abs(x) > Mathf.Abs(y))
+                        horizontal = x > 0? 1 : -1;
+                    else
+                        vertical = y > 0? 1 : -1;
+                }
+            }
+
+        #endif
         
         //플레이어가 움직이려 한다면
         if(horizontal != 0 || vertical != 0)
