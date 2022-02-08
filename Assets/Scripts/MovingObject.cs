@@ -16,6 +16,10 @@ public abstract class MovingObject : MonoBehaviour
     private Rigidbody2D rb2D;
     //움직인을 더 효율적으로 계산?
     private float inverseMoveTime;
+    //Is the object currently moving.
+    public bool isMoving;
+
+    public Player thePlayer;
 
     //protected virtual 함수: 자식 클래스가 덮어써서 재정의 가능(오버라이드)
     protected virtual void Start()
@@ -24,6 +28,7 @@ public abstract class MovingObject : MonoBehaviour
         rb2D = GetComponent<Rigidbody2D>();
         //moveTime의 역수 -> 나누기 대신 곱하기로 효율적인 계산
         inverseMoveTime = 1f / moveTime;
+        thePlayer = FindObjectOfType<Player>();
     }
 
     //out: 입력을 레퍼런스로 받음(Move 함수가 두 개 이상의 값을 리턴하기 위해)
@@ -41,7 +46,7 @@ public abstract class MovingObject : MonoBehaviour
 
         //뭔가 부딪쳤는지 체크
         //null이면 이동 가능
-        if (hit.transform == null)
+        if (hit.transform == null && !isMoving)
         {
             StartCoroutine(SmoothMovement(end));
             //이동했다는 뜻
@@ -56,6 +61,9 @@ public abstract class MovingObject : MonoBehaviour
     //end: 어디로 이동할 건지 표시
     protected IEnumerator SmoothMovement(Vector3 end)
     {
+        //The object is now moving.
+        isMoving = true;
+
         //end와 현재 위치의 차이 벡터에 sqrMagintude로 거리를 구함
         //Magintude: 벡터 길이, sqrMagnitude: 벡터 길이 제곱
         float sqrRemainingDistance = (transform.position - end).sqrMagnitude;
@@ -72,6 +80,13 @@ public abstract class MovingObject : MonoBehaviour
             //루프를 갱신하기 전 다음 프레임을 기다림
             yield return null;
         }
+
+        //Make sure the object is exactly at the end of its movement.
+        rb2D.MovePosition(end);
+
+        //The object is no longer moving.
+        isMoving = false;
+        thePlayer.consumeFood = true;
     }
 
     //일반형(Generic) 입력 T는 막혔을 때 컴포넌트 타입을 가리키기 위해 사용
@@ -84,7 +99,7 @@ public abstract class MovingObject : MonoBehaviour
         //이동 성공: true, 실패: false 반환
         bool canMove = Move(xDir, yDir, out hit);
 
-        //Move에서 부딪친 transform이 null인지 확인        
+        //Move에서 부딪친 transform이 null인지 확인
         if (hit.transform == null)
             //Move에서 라인캐스트가 다른 것과 부딪치지 않았다면 리턴 이후 코드를 실행하지 않음
             return;
@@ -94,7 +109,9 @@ public abstract class MovingObject : MonoBehaviour
 
         //움직이던 오브젝트가 막혔고, 상호작용할 수 있는 오브젝트와 충돌함
         if (!canMove && hitComponent != null)
+        {
             OnCantMove(hitComponent);
+        }
     }
 
     //일반형(Generic) 입력 T를 T형의 component라는 변수로써 받아옴

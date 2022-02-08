@@ -31,7 +31,7 @@ public class Enemy : MovingObject
     protected override void AttemptMove<T>(int xDir, int yDir)
     {
         //참이면 적 턴 스킵
-        if(skipMove)
+        if (skipMove)
         {
             //턴이 돌아올 때만 움직일 수 있음
             skipMove = false;
@@ -53,7 +53,7 @@ public class Enemy : MovingObject
 
         //현재 transform 위치, target 위치 차이 체크(transform x좌표와 transform x좌표의 차이가 사실상 0인 앱실론보다 작은지 체크)
         //x좌표가 대충 같은지 체크(적과 플레이어가 같은 열에 속하는지)
-        if(Mathf.Abs(target.position.x - transform.position.x) < float.Epsilon)
+        if (Mathf.Abs(target.position.x - transform.position.x) < float.Epsilon)
             //target y좌표가 transform y좌표보다 큰지 체크
             //참: 플레이어를 향해 위로 이동(1), 거짓: 플레이어를 향해 아래로 이동(-1)
             //수직 방향 이동
@@ -64,14 +64,14 @@ public class Enemy : MovingObject
             //참: 오른쪽으로 이동(1), 거짓: 왼쪽으로 이동(-1)
             xDir = target.position.x > transform.position.x ? 1 : -1;
 
-            //Player를 일반형 입력으로 넣고. x방향과 y방향도 입력
-            AttemptMove<Player>(xDir, yDir)   ;         
+        //Player를 일반형 입력으로 넣고. x방향과 y방향도 입력
+        AttemptMove<Player>(xDir, yDir);
     }
 
     //플레이어가 점거 중인 공간으로 적이 이동 시도할 때 호출됨
     //추상 함수로 선언된 MovingObject의 OnCantMove 재정의
     //플레이어를 가리킬 일반형 T
-    //T 타입의 component 변수를 입력으로 받으
+    //T 타입의 component 변수를 입력으로 받음
     protected override void OnCantMove<T>(T component)
     {
         //컴포넌트를 Player로 형변환 
@@ -79,7 +79,7 @@ public class Enemy : MovingObject
 
         //데미지만큼 음식 점수를 잃음
         hitPlayer.LoseFood(playerDamage);
-        
+
         animator.SetTrigger("enemyAttack");
 
         SoundManager.instance.RandomizeSfx(enemyAttack1, enemyAttack2);

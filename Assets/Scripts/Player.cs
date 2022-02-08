@@ -31,6 +31,9 @@ public class Player : MovingObject
     //실제 터치가 이루어지기 전까진 거짓값으로 초기화
     private Vector2 touchOrigin = -Vector2.one;
 
+    //움직일 때 음식을 소모할 수 있는 상태(1씩 감소시키기 위해)
+    public bool consumeFood = true;
+
 
     //Player의 Start를 구현
     protected override void Start()
@@ -118,9 +121,11 @@ public class Player : MovingObject
         
         //플레이어가 움직이려 한다면
         if(horizontal != 0 || vertical != 0)
+        {
             //<T>: 상호작용할 오브젝트가 될 일반형 입력 -> 함수를 호출할 때 상호작용할 컴포넌트 특정 가능
             //일반형 변수 Wall -> 플레이어가 상호작용할 수 있는 벽에 대면할지도 모른다는 의미
             AttemptMove<Wall>(horizontal, vertical);
+        }
     }
 
     //일반형 입력 T를 받음 -> 움직이는 오브젝트가 마주칠 대상의 컴포넌트의 타입을 가리킴
@@ -128,7 +133,11 @@ public class Player : MovingObject
     protected override void AttemptMove<T>(int xDir, int yDir)
     {
         //움직일 때마다 음식 점수 1 잃음
-        food--;
+        if(consumeFood)
+        {
+            consumeFood = false;
+            food--;
+        }
         foodText.text = "Food: " + food;
 
         //부모 클래스의 AttemptMove 호출

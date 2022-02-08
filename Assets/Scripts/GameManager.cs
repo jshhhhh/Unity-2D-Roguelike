@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     public static GameManager instance = null;
     public BoardManager boardScript;
     public int playerFoodPoints = 100;
-    [HideInInspector]public bool playersTurn = true;
+    [HideInInspector] public bool playersTurn = true;
 
     //레벨 숫자를 표시할 텍스트(Day 1...)
     private Text levelText;
@@ -29,6 +29,9 @@ public class GameManager : MonoBehaviour
     private bool enemiesMoving;
     //게임 보드를 만드는 중인지 체크, 만드는 중에는 플레이어 움직임 방지
     private bool doingSetup;
+
+    public Player thePlayer;
+    //public bool waitUntilPlayerStop = true;
 
     // Start is called before the first frame update
     void Awake()
@@ -50,6 +53,8 @@ public class GameManager : MonoBehaviour
         enemies = new List<Enemy>();
         boardScript = GetComponent<BoardManager>();
         InitGame();
+
+        thePlayer = FindObjectOfType<Player>();
     }
 
     //유니티 API 기본 제공 함수
@@ -66,7 +71,6 @@ public class GameManager : MonoBehaviour
     void InitGame()
     {
         //타이틀 카드가 뜨는 동안 플레이어는 움직일 수 없음
-
         levelImage = GameObject.Find("LevelImage");
         levelText = GameObject.Find("LevelText").GetComponent<Text>();
         levelText.text = "Day " + level;
@@ -99,11 +103,9 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         //enemiesMoving: 적이 이동 중
-        if(playersTurn || enemiesMoving || doingSetup)
+        if (playersTurn || enemiesMoving || doingSetup)
             //아래 코드 실행하지 않음
             return;
-        
-        StartCoroutine(MoveEnemies());
     }
 
     //적들이 자신을 게임 매니저에 등록하도록 해서 게임 매니저가 적들이 움직이도록 명령할 수 있게 함
@@ -120,14 +122,14 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(turnDelay);
         //적들이 아무도 없는지(첫 레벨인지)
         //적 리스트 길이를 enemies.Count로 체크
-        if(enemies.Count == 0)
+        if (enemies.Count == 0)
         {
             //대기하는 적이 없어도 일단 플레이어가 기다리도록
             yield return new WaitForSeconds(turnDelay);
         }
 
         //적 리스트만큼 루프
-        for(int i = 0; i < enemies.Count; i++)
+        for (int i = 0; i < enemies.Count; i++)
         {
             //MoveEnemy: 적들이 움직이도록 명령
             enemies[i].MoveEnemy();
