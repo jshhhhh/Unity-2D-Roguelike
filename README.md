@@ -15,9 +15,20 @@
 2022.01.12 ~ 2022.02.07+
 
 ## 강좌 내용
-player animator
 
-
+* Player, Enemys Animation
+* Tile Prefabs
+* Board Manager
+* Game Manager
+* Moving Objects
+* Walls
+* Player Animator Controller
+* Player Script
+* Enemy Script
+* Enemy Animator Controller
+* UI & Levels
+* Audio
+* Mobile (not yet tested)
 
 ## 정보
 
